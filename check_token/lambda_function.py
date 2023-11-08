@@ -89,3 +89,4 @@ def generate_jwt_token(cpf, secret):
     jwt_token = jwt.encode(token_payload, secret, algorithm="HS256")
 
     return jwt_token
+
