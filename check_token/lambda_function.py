@@ -1,21 +1,30 @@
 import json
-import jwt
 import boto3
+import jwt
+import psycopg2
 
-SECRET_NAME = "token-secret"  # Nome do segredo no AWS Secret Manager
+TOKEN_SECRET_NAME = "token-secret"  # Nome do segredo no AWS Secret Manager
+POSTGRES_SECRET_NAME = "postgres-secret"  # Nome do segredo no AWS Secret Manager
 
 def lambda_handler(event, context):
-    # Recebe o token JWT da entrada do evento
-    jwt_token = event.get("token")
+    # Recebe o CPF a partir do evento de entrada 
+    cpf = event.get("cpf")
 
-    if not jwt_token:
+    if not cpf:
         return {
             "statusCode": 400,
-            "body": json.dumps({"error": "Token JWT nao fornecido"})
+            "body": json.dumps({"error": "CPF nao fornecido"})
+        }
+    
+    # CPF deve ser válido
+    if not validate_cpf(cpf):
+        return {
+            "statusCode": 400,
+            "body": json.dumps({"error": "CPF invalido"})
         }
 
-    # Recupera o segredo do AWS Secret Manager
-    secret_value = get_secret_value(SECRET_NAME)
+    # Recupere o segredo do AWS Secret Manager
+    secret_value = get_secret_value(TOKEN_SECRET_NAME)
 
     if not secret_value:
         return {
@@ -25,22 +34,47 @@ def lambda_handler(event, context):
 
     secret = secret_value["SecretString"]
 
-    # Valida o token JWT
-    valid = validate_jwt_token(jwt_token, secret)
+    # Gere um token JWT usando o segredo
+    jwt_token = generate_jwt_token(cpf, secret)
 
-    if valid:
-        return {
-            "statusCode": 200,
-            "body": json.dumps({"status": "active"})
-        }
-    else:
-        return {
-            "statusCode": 401,
-            "body": json.dumps({"error": "Token JWT invalido ou expirado"})
-        }
+    return {
+        "statusCode": 200,
+        "body": json.dumps({"token": jwt_token})
+    }
+
+def validate_cpf(cpf):
+    postgres_secret = get_secret_value(POSTGRES_SECRET_NAME)
+    db_user = postgres_secret["username"]
+    db_password = postgres_secret["password"]
+    db_uri = f"postgresql://{db_user}:{db_password}@lanchonetedarua3.co2eflozi4t9.us-east-1.rds.amazonaws.com/postgres"
+
+    try:
+        # Estabelece uma conexão com o banco de dados
+        connection = psycopg2.connect(db_uri)
+        # Cria um cursor para executar consultas
+        cursor = connection.cursor()
+        # Consulta SQL para verificar se o CPF está na tabela cliente
+        query = f"SELECT * FROM cliente WHERE cpf = %s"
+        # Executa a consulta com o CPF fornecido
+        cursor.execute(query, (cpf,))
+        # Recupera os resultados da consulta
+        result = cursor.fetchone()
+        cursor.close()
+        connection.close()
+        
+        # Se a consulta retornar um resultado, o CPF está na tabela
+        if result:
+            return True
+        else:
+            return False
+    except Exception as e:
+        # Lida com erros de conexão ou consulta
+        print(f"Erro ao validar CPF: {e}")
+        return False
+
 
 def get_secret_value(secret_name):
-    # Conecta-se ao AWS Secret Manager e recupera o valor do segredo
+    # Conecte-se ao AWS Secret Manager e recupere o valor do segredo
     client = boto3.client("secretsmanager")
     response = client.get_secret_value(SecretId=secret_name)
 
@@ -49,18 +83,9 @@ def get_secret_value(secret_name):
     else:
         return None
 
-def validate_jwt_token(jwt_token, secret):
-    try:
-        # Decodificar o token JWT usando a chave secreta
-        token_payload = jwt.decode(jwt_token, secret, algorithms=["HS256"])
+def generate_jwt_token(cpf, secret):
+    # Gere um token JWT usando a biblioteca PyJWT
+    token_payload = {"cpf": cpf}
+    jwt_token = jwt.encode(token_payload, secret, algorithm="HS256")
 
-        # Verificar se o payload do token contém o campo "cpf"
-        if "cpf" in token_payload:
-            cpf = token_payload["cpf"]
-            return True
-        else:
-            return False
-    except jwt.ExpiredSignatureError:
-        return False
-    except jwt.InvalidTokenError:
-        return False
+    return jwt_token

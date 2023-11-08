@@ -1,3 +1,4 @@
 boto3==1.28.77
 pyjwt==2.8.0
 urllib3==1.26.6
+psycopg2==2.9.9
