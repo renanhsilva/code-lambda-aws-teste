@@ -49,7 +49,7 @@ jobs:
             --zip-file fileb://generate_token/lambda_generate_token.zip \
             --handler lambda_function.lambda_handler \
             --runtime python3.8 \
-            --role arn:aws:iam::731628207007:role/authentication
+            --role arn:aws:iam::990304834518:role/authentication
             echo "Function created"
           fi
 
@@ -67,6 +67,6 @@ jobs:
             --zip-file fileb://check_token/lambda_check_token.zip \
             --handler lambda_function.lambda_handler \
             --runtime python3.8 \
-            --role arn:aws:iam::731628207007:role/authentication
+            --role arn:aws:iam::990304834518:role/authentication
             echo "Function created"
           fi
