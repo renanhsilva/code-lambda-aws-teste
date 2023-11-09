@@ -56,7 +56,7 @@ def validate_cpf(cpf):
         # Cria um cursor para executar consultas
         cursor = connection.cursor()
         # Consulta SQL para verificar se o CPF está na tabela cliente
-        query = f"SELECT * FROM cliente WHERE cpf = {cpf}"
+        query = f"SELECT * FROM cliente WHERE cpf = '{cpf}'"
         # Executa a consulta com o CPF fornecido
         cursor.execute(query)
         # Recupera os resultados da consulta
@@ -65,7 +65,7 @@ def validate_cpf(cpf):
         connection.close()
         print(f"Resultado da consulta: {result}")
         # Se a consulta retornar um resultado, o CPF está na tabela
-        if result:
+        if result is not None:
             return True
         else:
             return False
