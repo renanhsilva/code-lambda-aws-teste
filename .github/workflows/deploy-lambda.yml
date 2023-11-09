@@ -40,7 +40,7 @@ jobs:
         run: |
           if aws lambda get-function --function-name lanchonete_generate_token; then
             aws lambda update-function-code \
-            --function-name generate_token \
+            --function-name lanchonete_generate_token \
             --zip-file fileb://generate_token/lambda_generate_token.zip
             echo "Function updated"
           else
