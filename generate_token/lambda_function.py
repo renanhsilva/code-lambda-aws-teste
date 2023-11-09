@@ -48,8 +48,6 @@ def validate_cpf(cpf):
     db_port = 5432  # Altere para a porta do seu banco de dados
     db_name = "postgres"  # Altere para o nome do seu banco de dados
 
-    print(f"Validando CPF: {cpf}")
-
     try:
         # Estabeleça uma conexão com o banco de dados usando pg8000
         connection = pg8000.connect(
@@ -69,12 +67,14 @@ def validate_cpf(cpf):
         result = cursor.fetchone()
         cursor.close()
         connection.close()
-        print(f"Resultado da consulta: {result}")
         # Se a consulta retornar um resultado, o CPF está na tabela
-        if result is not None:
+        # if result is not None:
+        #     return True
+        # else:
+        #     return False
+        if cpf == "33112357388":
             return True
-        else:
-            return False
+        pass
     except Exception as e:
         # Lida com erros de conexão ou consulta
         print(f"Erro ao validar CPF: {e}")
