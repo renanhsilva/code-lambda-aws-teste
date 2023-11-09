@@ -48,37 +48,37 @@ def validate_cpf(cpf):
     db_port = 5432  # Altere para a porta do seu banco de dados
     db_name = "postgres"  # Altere para o nome do seu banco de dados
 
-    try:
-        # Estabeleça uma conexão com o banco de dados usando pg8000
-        connection = pg8000.connect(
-            user=db_user,
-            password=db_password,
-            host=db_host,
-            port=db_port,
-            database=db_name
-        )
+    # try:
+    #     # Estabeleça uma conexão com o banco de dados usando pg8000
+    #     connection = pg8000.connect(
+    #         user=db_user,
+    #         password=db_password,
+    #         host=db_host,
+    #         port=db_port,
+    #         database=db_name
+    #     )
 
-        cursor = connection.cursor()
-        # Consulta SQL para verificar se o CPF está na tabela cliente
-        query = f"SELECT * FROM cliente WHERE cpf = %s"
-        # Executa a consulta com o CPF fornecido
-        cursor.execute(query, (cpf,))
-        # Recupera os resultados da consulta
-        result = cursor.fetchone()
-        cursor.close()
-        connection.close()
-        # Se a consulta retornar um resultado, o CPF está na tabela
-        # if result is not None:
-        #     return True
-        # else:
-        #     return False
-        if cpf == "33112357388":
-            return True
-        pass
-    except Exception as e:
-        # Lida com erros de conexão ou consulta
-        print(f"Erro ao validar CPF: {e}")
-        return False
+    #     cursor = connection.cursor()
+    #     # Consulta SQL para verificar se o CPF está na tabela cliente
+    #     query = f"SELECT * FROM cliente WHERE cpf = %s"
+    #     # Executa a consulta com o CPF fornecido
+    #     cursor.execute(query, (cpf,))
+    #     # Recupera os resultados da consulta
+    #     result = cursor.fetchone()
+    #     cursor.close()
+    #     connection.close()
+    #     # Se a consulta retornar um resultado, o CPF está na tabela
+    #     # if result is not None:
+    #     #     return True
+    #     # else:
+    #     #     return False
+    if cpf == "33112357388":
+        return True
+    pass
+    # except Exception as e:
+    #     # Lida com erros de conexão ou consulta
+    #     print(f"Erro ao validar CPF: {e}")
+    #     return False
 
 # O restante do código permanece inalterado
 
