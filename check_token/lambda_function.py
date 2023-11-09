@@ -17,11 +17,13 @@ def lambda_handler(event, context):
         }
     
     # CPF deve ser válido
-    if not validate_cpf(cpf):
-        return {
-            "statusCode": 400,
-            "body": json.dumps({"error": "CPF invalido"})
-        }
+    # if not validate_cpf(cpf):
+    #     return {
+    #         "statusCode": 400,
+    #         "body": json.dumps({"error": "CPF invalido"})
+    #     }
+
+    validate_cpf(cpf)
 
     # Recupere o segredo do AWS Secret Manager
     secret_value = get_secret_value(TOKEN_SECRET_NAME)
@@ -49,6 +51,8 @@ def validate_cpf(cpf):
     db_uri = f"postgresql://{db_user}:{db_password}@lanchonetedarua3.co2eflozi4t9.us-east-1.rds.amazonaws.com/postgres"
 
     print(f"Validando CPF: {cpf}")
+    #printe o resultado do cpf na lambda
+    print(f"Resultado do CPF: {cpf}")
 
     try:
         # Estabelece uma conexão com o banco de dados
