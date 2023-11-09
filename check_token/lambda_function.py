@@ -61,7 +61,7 @@ def validate_cpf(cpf):
         result = cursor.fetchone()
         cursor.close()
         connection.close()
-        
+        print(f"Resultado da consulta: {result}")
         # Se a consulta retornar um resultado, o CPF está na tabela
         if result:
             return True
